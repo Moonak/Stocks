@@ -167,12 +167,30 @@ class load:
         self.vol_avg=scaler.transform(self.vol_avg)
 
 ############################################################################
-AP=load('/home/mohammadreza/Desktop/python stock/Asan Pardakht Pers-a.csv')
-AP.avarage()
-AP.norm()
-print(AP.vol_avg)
+    def train(self,N,train_size=0.6):
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, LSTM
+        self.x_train = np.array( [ self.open_avg[i:N+i]+
+             self.high_avg[i:N+i]+
+             self.low_avg[i:N+i]+
+             self.close_avg[i:N+i]+
+             self.vol_avg[i:N+i] \
+    for i in range(int(train_size*(len(self.close_avg)-N))) ] )
+        self.y_train = np.array( [self.close_avg[N+i] \
+    for i in range(int(train_size*(len(self.close_avg)-N))) ] )
+        lstm_units=50                  # lstm param. initial value before tuning.
+        dropout_prob=1                 # lstm param. initial value before tuning.
+        optimizer='adam'               # lstm param. initial value before tuning.
+        epochs=12                       # lstm param. initial value before tuning.
+        batch_size=1                   # lstm param. initial value before tuning.
+        model = Sequential()
+        model.add(LSTM(units=lstm_units, return_sequences=True,
+               input_shape=( self.x_train.shape[1],1)))
+        model.add(Dropout(dropout_prob)) # Add dropout with a probability of 0.5
+        model.add(LSTM(units=lstm_units))
+        model.add(Dropout(dropout_prob)) # Add dropout with a probability of 0.5
+        model.add(Dense(1))
 
-import matplotlib.pyplot as plt
-
-plt.plot(np.arange(len(AP.close_avg)) , AP.close_avg)
-#plt.plot(np.arange(len(AP.open)) , AP.open)
+        model.compile(loss='mean_squared_error', optimizer=optimizer)
+        model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, verbose=2)
+        model.summary()
