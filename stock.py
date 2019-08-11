@@ -12,11 +12,11 @@ class load:
         self.date   = \
         np.array( [date(int(str(i)[:4]),int(str(i)[4:6]),int(str(i)[6:8]))\
                  for i in self.data[1:,0]] )
-        self.open   = self.data[1:,2]
-        self.high   = self.data[1:,3]
-        self.low    = self.data[1:,4]
-        self.close  = self.data[1:,5]
-        self.vol    = self.data[1:,6]    
+        self.open   = self.data[1:,1]
+        self.high   = self.data[1:,2]
+        self.low    = self.data[1:,3]
+        self.close  = self.data[1:,4]
+        self.vol    = self.data[1:,5]    
     
     def avarage(self,nweeks=1):
         self.open_avg  =[] 
@@ -167,7 +167,7 @@ class load:
         self.vol_avg=scaler.transform(self.vol_avg)
 
 ############################################################################
-AP=load('/home/mohammadreza/Desktop/python stock/IRO1APPE0001_165327530.csv')
+AP=load('/home/mohammadreza/Desktop/python stock/Asan Pardakht Pers-a.csv')
 AP.avarage()
 AP.norm()
 print(AP.vol_avg)
@@ -175,4 +175,4 @@ print(AP.vol_avg)
 import matplotlib.pyplot as plt
 
 plt.plot(np.arange(len(AP.close_avg)) , AP.close_avg)
-#plt.plot(np.arange(len(AP.close)) , AP.close)
+#plt.plot(np.arange(len(AP.open)) , AP.open)
