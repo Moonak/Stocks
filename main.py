@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-AP=load('/home/kanjouri/Moonak/Stocks/AP.csv')
-AP.avarage(nweeks=2)
+AP=load('/home/mohammadreza/Desktop/Stocks/AP.csv')
+AP.avarage(nweeks=1)
 AP.norm()
-AP.train(4)
+AP.train(9,epochs=50,dropout_prob=.1)
 #print(AP.vol_avg)
 
 
