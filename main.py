@@ -1,6 +1,4 @@
 from stock import load
-import numpy as np
-
 
 AP=load('/home/mohammadreza/Desktop/Stocks/AP.csv')
 AP.avarage(nweeks=1)
