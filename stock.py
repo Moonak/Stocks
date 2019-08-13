@@ -211,7 +211,7 @@ class load:
         plt.plot(np.arange(len(self.close_avg)) , self.close_avg,'r')
         #plt.plot(np.arange(len(AP.y_train)+9,len(AP.y_train)+len(AP.y_test)+9) , AP.y_test,'g')
         #plt.plot(np.arange(len(AP.close_avg)) , AP.close_avg,'--')
-        plt.scatter([int(train_size*(len(self.close_avg)))+i for i in range(-NPW,1)],self.estimate)
+        plt.plot([int(train_size*(len(self.close_avg)))+i for i in range(-NPW,1)],self.estimate)
         plt.xlim(130,149)
         plt.ylim(.50,.9)
         print(self.estimate)    
