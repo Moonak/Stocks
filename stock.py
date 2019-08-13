@@ -167,7 +167,7 @@ class load:
         self.vol_avg=scaler.transform(self.vol_avg)
 
 ############################################################################
-    def train(self,N,train_size=0.6,epochs=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=50,batch_size=1):
+    def train(self,N,NPW=4,train_size=1,epochs=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, LSTM
         self.x_train = np.array( [ self.open_avg[i:N+i]+
@@ -178,11 +178,19 @@ class load:
     for i in range(int(train_size*(len(self.close_avg)-N))) ] )
         self.y_train = np.array( [self.close_avg[N+i] \
     for i in range(int(train_size*(len(self.close_avg)-N))) ] )
+        self.x_test = np.array( [ self.open_avg[i:N+i]+
+             self.high_avg[i:N+i]+
+             self.low_avg[i:N+i]+
+             self.close_avg[i:N+i]+
+             self.vol_avg[i:N+i] \
+    for i in range(int(train_size*(len(self.close_avg)-N)),len(self.close_avg)-N) ] )
+        self.y_test = np.array( [self.close_avg[N+i] \
+    for i in range(int(train_size*(len(self.close_avg)-N)),len(self.close_avg)-N) ] )
 
 
         model = Sequential()
         model.add(LSTM(units=lstm_units, return_sequences=True,
-               input_shape=( self.x_train.shape[1],1)))
+               input_shape=(N,1)))
         model.add(Dropout(dropout_prob)) # Add dropout with a probability of 0.5
         model.add(LSTM(units=lstm_units))
         model.add(Dropout(dropout_prob)) # Add dropout with a probability of 0.5
@@ -191,3 +199,19 @@ class load:
         model.compile(loss=loss, optimizer=optimizer)
         model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, verbose=2)
         model.summary()
+        self.estimate=[]
+        for i in range(int(train_size*(len(self.close_avg)-N))-NPW,int(train_size*(len(self.close_avg)-N))+1):
+            self.est_scaled = model.predict(np.array( [ self.open_avg[i:N+i]+
+                                                       self.high_avg[i:N+i]+
+                                                       self.low_avg[i:N+i]+
+                                                       self.close_avg[i:N+i]+
+                                                       self.vol_avg[i:N+i]] ))
+            self.estimate.append(float(self.est_scaled))
+        import matplotlib.pyplot as plt
+        plt.plot(np.arange(len(self.close_avg)) , self.close_avg,'r')
+        #plt.plot(np.arange(len(AP.y_train)+9,len(AP.y_train)+len(AP.y_test)+9) , AP.y_test,'g')
+        #plt.plot(np.arange(len(AP.close_avg)) , AP.close_avg,'--')
+        plt.scatter([int(train_size*(len(self.close_avg)))+i for i in range(-NPW,1)],self.estimate)
+        plt.xlim(130,149)
+        plt.ylim(.50,.9)
+        print(self.estimate)    
