@@ -167,7 +167,7 @@ class load:
         self.vol_avg=scaler.transform(self.vol_avg)
 
 ############################################################################
-    def train(self,N,NPW=4,train_size=1,epochs=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
+    def train(self,N,NPW=4,train_size=1,epochs=1,verbose=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, LSTM
         self.x_train = np.array( [ self.open_avg[i:N+i]+
@@ -197,7 +197,7 @@ class load:
         model.add(Dense(1))
 
         model.compile(loss=loss, optimizer=optimizer)
-        model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, verbose=2)
+        model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, verbose=verbose)
         model.summary()
         self.estimate=[]
         for i in range(int(train_size*(len(self.close_avg)-N))-NPW,int(train_size*(len(self.close_avg)-N))+1):
