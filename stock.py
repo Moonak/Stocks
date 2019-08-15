@@ -18,7 +18,7 @@ class load:
         self.close  = self.data[1:,4]
         self.vol    = self.data[1:,5]
         self.num    = self.data[1:,6]
-        self.name   = self.data[1:,7][1]
+        self.name   = str(self.data[1:,7][1])
     
     def avarage(self,nweeks=1):
         self.open_avg  =[] 
