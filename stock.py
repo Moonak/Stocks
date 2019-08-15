@@ -16,7 +16,9 @@ class load:
         self.high   = self.data[1:,2]
         self.low    = self.data[1:,3]
         self.close  = self.data[1:,4]
-        self.vol    = self.data[1:,5]    
+        self.vol    = self.data[1:,5]
+        self.num    = self.data[1:,6]
+        self.name   = self.data[1:,7]
     
     def avarage(self,nweeks=1):
         self.open_avg  =[] 
@@ -24,6 +26,8 @@ class load:
         self.low_avg   =[]
         self.close_avg =[] 
         self.vol_avg   =[] 
+        self.num_avg   =[] 
+
         
         self.firstSat=self.date[np.where(np.array([d.weekday() for d in self.date])==5)[0][0]]
         while (self.firstSat<date.today() ) :
@@ -32,6 +36,7 @@ class load:
             self.low_avg.append([])
             self.close_avg.append([])
             self.vol_avg.append([])
+            self.num_avg.append([])
             for i in range(nweeks*7-1):
                    self.index = np.where(self.date == self.firstSat+timedelta(i))
                    self.open_avg[-1].append(self.open[self.index])
@@ -39,6 +44,7 @@ class load:
                    self.low_avg[-1].append(self.low[self.index])
                    self.close_avg[-1].append(self.close[self.index])
                    self.vol_avg[-1].append(self.vol[self.index])
+                   self.num_avg[-1].append(self.num[self.index])
             self.firstSat+=timedelta(weeks=nweeks)
         for i in range(len(self.open_avg)):
             self.temp =0
@@ -135,6 +141,25 @@ class load:
                 self.temp=self.vol_avg.index(t)
                 self.vol_avg[self.temp] = self.vol_avg[self.temp-1] 
 ############################################################################
+        for i in range(len(self.num_avg)):
+            self.temp =0
+            self.counter =0 
+            for j in range(len(self.num_avg[i])):
+                try:
+                    self.temp += float(self.num_avg[i][j])
+                    self.counter += 1
+                except: None 
+            try:    
+                self.num_avg[i] = self.temp/self.counter
+                #print(self.counter)
+            except: 
+                #print('HBDG')
+                self.num_avg[i] = None 
+        for t in self.num_avg:
+            if t == None:
+                self.temp=self.num_avg.index(t)
+                self.num_avg[self.temp] = self.num_avg[self.temp-1] 
+############################################################################
     def norm(self):
         self.open_avg = np.array(self.open_avg)
         self.open_avg=self.open_avg.reshape(-1,1)
@@ -165,6 +190,12 @@ class load:
         scaler=MinMaxScaler(feature_range=(-.9,.9))
         scaler.fit(self.vol_avg)
         self.vol_avg=scaler.transform(self.vol_avg)
+#####################################
+        self.num_avg = np.array(self.num_avg)
+        self.numl_avg=self.num_avg.reshape(-1,1)
+        scaler=MinMaxScaler(feature_range=(-.9,.9))
+        scaler.fit(self.num_avg)
+        self.num_avg=scaler.transform(self.num_avg)
 
 ############################################################################
     def train(self,N,NPW=4,train_size=1,epochs=1,verbose=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
@@ -174,7 +205,8 @@ class load:
              self.high_avg[i:N+i]+
              self.low_avg[i:N+i]+
              self.close_avg[i:N+i]+
-             self.vol_avg[i:N+i] \
+             self.vol_avg[i:N+i]+
+             self.num_avg[i:N+i]\
     for i in range(int(train_size*(len(self.close_avg)-N))) ] )
         self.y_train = np.array( [self.close_avg[N+i] \
     for i in range(int(train_size*(len(self.close_avg)-N))) ] )
@@ -182,7 +214,8 @@ class load:
              self.high_avg[i:N+i]+
              self.low_avg[i:N+i]+
              self.close_avg[i:N+i]+
-             self.vol_avg[i:N+i] \
+             self.vol_avg[i:N+i]+
+             self.num_avg[i:N+i]\
     for i in range(int(train_size*(len(self.close_avg)-N)),len(self.close_avg)-N) ] )
         self.y_test = np.array( [self.close_avg[N+i] \
     for i in range(int(train_size*(len(self.close_avg)-N)),len(self.close_avg)-N) ] )
@@ -205,7 +238,8 @@ class load:
                                                        self.high_avg[i:N+i]+
                                                        self.low_avg[i:N+i]+
                                                        self.close_avg[i:N+i]+
-                                                       self.vol_avg[i:N+i]] ))
+                                                       self.vol_avg[i:N+i]+
+                                                       self.num_avg[i:N+i]] ))
             self.estimate.append(float(self.est_scaled))
         #import matplotlib.pyplot as plt
         #plt.plot(np.arange(len(self.close_avg)) , self.close_avg,'r')
