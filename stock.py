@@ -198,7 +198,7 @@ class load:
         self.vol_avg=scaler.transform(self.vol_avg)
 #####################################
         self.num_avg = np.array(self.num_avg)
-        self.numl_avg=self.num_avg.reshape(-1,1)
+        self.num_avg=self.num_avg.reshape(-1,1)
         scaler=MinMaxScaler(feature_range=(-.9,.9))
         scaler.fit(self.num_avg)
         self.num_avg=scaler.transform(self.num_avg)
