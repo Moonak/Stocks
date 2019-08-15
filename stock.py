@@ -4,6 +4,7 @@
 import numpy as np
 from datetime import date ,timedelta
 from sklearn.preprocessing import MinMaxScaler
+import csv
 
 class load:
     def __init__ (self,filename):
@@ -18,7 +19,12 @@ class load:
         self.close  = self.data[1:,4]
         self.vol    = self.data[1:,5]
         self.num    = self.data[1:,6]
-        self.name   = str(self.data[1:,7][1])
+        with open('StockData/'+self.filename) as csvfile:
+            readCSV = csv.reader(csvfile, delimiter=',')
+            for row in readCSV:
+                self.name   = row[-1]
+                if row[-1]!='<OPENINT>' : break
+
     
     def avarage(self,nweeks=1):
         self.open_avg  =[] 
