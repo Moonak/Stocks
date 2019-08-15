@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 class load:
     def __init__ (self,filename):
         self.filename = filename
-        self.data   = np.genfromtxt(self.filename,delimiter=',')
+        self.data   = np.genfromtxt('StockData/'+self.filename,delimiter=',',names=True,dtype=None)
         self.date   = \
         np.array( [date(int(str(i)[:4]),int(str(i)[4:6]),int(str(i)[6:8]))\
                  for i in self.data[1:,0]] )
