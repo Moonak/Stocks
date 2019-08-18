@@ -9,7 +9,7 @@ import csv
 class load:
     def __init__ (self,filename):
         self.filename = filename
-        self.data   = np.genfromtxt('StockData/'+self.filename,delimiter=',')
+        self.data   = np.genfromtxt(self.filename,delimiter=',')
         self.date   = \
         np.array( [date(int(str(i)[:4]),int(str(i)[4:6]),int(str(i)[6:8]))\
                  for i in self.data[1:,0]] )
@@ -19,7 +19,7 @@ class load:
         self.close  = self.data[1:,4]
         self.vol    = self.data[1:,5]
         self.num    = self.data[1:,6]
-        with open('StockData/'+self.filename) as csvfile:
+        with open(self.filename) as csvfile:
             readCSV = csv.reader(csvfile, delimiter=',')
             for row in readCSV:
                 self.name   = row[-1]
@@ -204,8 +204,9 @@ class load:
         self.num_avg=scaler.transform(self.num_avg)
 
 ############################################################################
-    def train(self,N,NPW=4,train_size=1,epochs=1,verbose=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
+    def train(self,N,NT,NPW=4,train_size=1,epochs=1,verbose=1,optimizer='adam',loss='mean_squared_error',dropout_prob=.9,lstm_units=100,batch_size=4):
         from keras.models import Sequential
+        import random
         from keras.layers import Dense, Dropout, LSTM
         self.x_train = np.array( [ self.open_avg[i:N+i]+
              self.high_avg[i:N+i]+
@@ -247,6 +248,31 @@ class load:
                                                        self.vol_avg[i:N+i]+
                                                        self.num_avg[i:N+i]] ))
             self.estimate.append(float(self.est_scaled))
+        i=0
+        EROR = 0
+        testlist = []
+        while(i<NT):
+           i += 1
+           testlist.append((int(round(random.uniform(N+1, len(self.open_avg)), 0))))
+        for t in testlist:
+            modeltest1 = model.predict(np.array( [ self.open_avg[t-N:t]+
+                                                       self.high_avg[t-N:t]+
+                                                       self.low_avg[t-N:t]+
+                                                       self.close_avg[t-N:t]+
+                                                       self.vol_avg[t-N:t]+
+                                                       self.num_avg[t-N:t]] ))
+            modeltest2 = model.predict(np.array( [ self.open_avg[t-N-1:t-1]+
+                                                       self.high_avg[t-N-1:t-1]+
+                                                       self.low_avg[t-N-1:t-1]+
+                                                       self.close_avg[t-N-1:t-1]+
+                                                       self.vol_avg[t-N-1:t-1]+
+                                                       self.num_avg[t-N-1:t-1]] ))
+            modeltest   = modeltest1-modeltest2
+            reality     = self.close_avg[t+1]-self.close_avg[t]
+            eror=abs(modeltest - reality)        
+            EROR += eror
+        print(EROR)
+        
         #import matplotlib.pyplot as plt
         #plt.plot(np.arange(len(self.close_avg)) , self.close_avg,'r')
         #plt.plot(np.arange(len(AP.y_train)+9,len(AP.y_train)+len(AP.y_test)+9) , AP.y_test,'g')
@@ -255,3 +281,7 @@ class load:
         #plt.xlim(130,149)
         #plt.ylim(.50,.9)
         #print(self.estimate)    
+##########################################################        
+        
+         
+        
