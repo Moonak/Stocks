@@ -9,7 +9,7 @@ import csv
 class load:
     def __init__ (self,filename):
         self.filename = filename
-        self.data   = np.genfromtxt(self.filename,delimiter=',')
+        self.data   = np.genfromtxt('StockData/' + self.filename,delimiter=',')
         self.date   = \
         np.array( [date(int(str(i)[:4]),int(str(i)[4:6]),int(str(i)[6:8]))\
                  for i in self.data[1:,0]] )
@@ -19,7 +19,7 @@ class load:
         self.close  = self.data[1:,4]
         self.vol    = self.data[1:,5]
         self.num    = self.data[1:,6]
-        with open(self.filename) as csvfile:
+        with open('StockData/' +self.filename) as csvfile:
             readCSV = csv.reader(csvfile, delimiter=',')
             for row in readCSV:
                 self.name   = row[-1]
