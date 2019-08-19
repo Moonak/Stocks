@@ -248,30 +248,7 @@ class load:
                                                        self.vol_avg[i:N+i]+
                                                        self.num_avg[i:N+i]] ))
             self.estimate.append(float(self.est_scaled))
-        i=0
-        EROR = 0
-        testlist = []
-        while(i<NT):
-           i += 1
-           testlist.append((int(round(random.uniform(N+1, len(self.open_avg)), 0))))
-        for t in testlist:
-            modeltest1 = model.predict(np.array( [ self.open_avg[t-N:t]+
-                                                       self.high_avg[t-N:t]+
-                                                       self.low_avg[t-N:t]+
-                                                       self.close_avg[t-N:t]+
-                                                       self.vol_avg[t-N:t]+
-                                                       self.num_avg[t-N:t]] ))
-            modeltest2 = model.predict(np.array( [ self.open_avg[t-N-1:t-1]+
-                                                       self.high_avg[t-N-1:t-1]+
-                                                       self.low_avg[t-N-1:t-1]+
-                                                       self.close_avg[t-N-1:t-1]+
-                                                       self.vol_avg[t-N-1:t-1]+
-                                                       self.num_avg[t-N-1:t-1]] ))
-            modeltest   = modeltest1-modeltest2
-            reality     = self.close_avg[t+1]-self.close_avg[t]
-            eror=abs(modeltest - reality)        
-            EROR += eror
-        print(EROR)
+
         
         #import matplotlib.pyplot as plt
         #plt.plot(np.arange(len(self.close_avg)) , self.close_avg,'r')
